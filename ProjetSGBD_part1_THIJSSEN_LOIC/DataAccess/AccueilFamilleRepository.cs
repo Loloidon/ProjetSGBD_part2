@@ -19,8 +19,56 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 
         public void Ajouter(AccueilFamille accueilfamille)
         {
+
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
+            string checkEtatSql = @"
+        SELECT etat_courant
+        FROM animal
+        WHERE id_animal = @id_animal;
+    ";
+
+            using var checkEtatCommand = new NpgsqlCommand(checkEtatSql, connection);
+            checkEtatCommand.Parameters.AddWithValue("@id_animal", accueilfamille.IdAnimal);
+
+            object? etatResult = checkEtatCommand.ExecuteScalar();
+
+            if (etatResult == null)
+            {
+                Console.WriteLine("Animal introuvable.");
+                return;
+            }
+
+            string etat = etatResult.ToString() ?? "";
+
+            if (etat == "adopte")
+            {
+                Console.WriteLine("Impossible : cet animal est déjà adopté.");
+                return;
+            }
+
+            if (etat == "decede")
+            {
+                Console.WriteLine("Impossible : cet animal est décédé.");
+                return;
+            }
+            string checkSql = @"
+            SELECT COUNT(*)
+            FROM accueil_famille
+            WHERE id_animal = @id_animal
+            AND date_fin IS NULL;
+        ";
+
+            using var checkCommand = new NpgsqlCommand(checkSql, connection);
+            checkCommand.Parameters.AddWithValue("@id_animal", accueilfamille.IdAnimal);
+
+            long nbAccueilsActifs = (long)checkCommand.ExecuteScalar();
+
+            if (nbAccueilsActifs > 0)
+            {
+                Console.WriteLine("Impossible : cet animal est déjà dans une famille d'accueil active.");
+                return;
+            }
 
             string sql = @"
                 Insert INTO accueil_famille
@@ -39,6 +87,16 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 
 
             command.ExecuteNonQuery();
+                    string updateSql = @"
+            UPDATE animal
+            SET etat_courant = 'accueilli'
+            WHERE id_animal = @id_animal;
+";
+
+            using var updateCommand = new NpgsqlCommand(updateSql, connection);
+            updateCommand.Parameters.AddWithValue("@id_animal", accueilfamille.IdAnimal);
+            updateCommand.ExecuteNonQuery();
+
 
             connection.Close();
         }

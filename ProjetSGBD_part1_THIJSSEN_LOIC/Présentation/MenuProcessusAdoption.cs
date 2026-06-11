@@ -39,14 +39,12 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.Présentation
 
             adoption.DateDemande = LireDate("Date de demande (yyyy-mm-dd) : ");
 
-            adoption.StatutAdoption = LireChoix(
-                "Statut (demande/acceptee/rejet_environnement/rejet_comportement) : ",
-                new[] { "demande", "acceptee", "rejet_environnement", "rejet_comportement" }
-            );
+            adoption.StatutAdoption = "demande";
+           
 
             _adoptionRepository.Ajouter(adoption);
 
-            Console.WriteLine("Adoption ajoutée !");
+            Console.WriteLine("---");
         }
 
         public void ListerAdoptions()
