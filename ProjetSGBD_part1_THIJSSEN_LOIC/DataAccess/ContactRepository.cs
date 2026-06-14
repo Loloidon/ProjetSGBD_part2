@@ -49,7 +49,7 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             }
         }
 
-        public void Supprimer(int id)
+        public bool Supprimer(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
@@ -62,11 +62,12 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             try
             {
                 command.ExecuteNonQuery();
-                Console.WriteLine("Contact supprimé.");
+                return true;
             }
             catch (PostgresException ex)
             {
                 Console.WriteLine(ex.MessageText);
+                return false;
             }
         }
 
@@ -161,5 +162,57 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                 );
             }
         }
+        public List<Contact> GetAll()
+        {
+            List<Contact> contacts = new List<Contact>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM afficher_tous_contacts();";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                contacts.Add(LireContact(reader));
+            }
+
+            return contacts;
+        }
+
+        public Contact? GetById(int id)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM afficher_un_contact(@id);";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
+
+            using var reader = command.ExecuteReader();
+
+            if (reader.Read())
+                return LireContact(reader);
+
+            return null;
+        }
+
+        private Contact LireContact(NpgsqlDataReader reader)
+        {
+            return new Contact
+            {
+                IdContact = Convert.ToInt32(reader["id_contact"]),
+                Nom = reader["nom"].ToString() ?? "",
+                Prenom = reader["prenom"].ToString() ?? "",
+                Registre = reader["registre"].ToString() ?? "",
+                Adresse = reader["adresse"].ToString() ?? "",
+                Gsm = reader["gsm"].ToString() ?? "",
+                Mail = reader["mail"].ToString() ?? ""
+            };
+        }
+
     }
 }

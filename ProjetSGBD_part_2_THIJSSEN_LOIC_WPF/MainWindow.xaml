@@ -14,7 +14,10 @@
         Height="40"
         Margin="0,5"
         Click="btnAnimaux_Click"/>
-        <Button Content="Contacts" Height="40" Margin="0,5"/>
+        <Button Content="Contacts"
+        Height="40"
+        Margin="0,5"
+        Click="btnContacts_Click"/>
         <Button Content="Adoptions" Height="40" Margin="0,5"/>
         <Button Content="Familles d'accueil" Height="40" Margin="0,5"/>
         <Button Content="Vaccinations" Height="40" Margin="0,5"/>

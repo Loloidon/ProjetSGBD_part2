@@ -14,5 +14,10 @@ namespace ProjetSGBD_part_2_THIJSSEN_LOIC_WPF
             AnimalWindow window = new AnimalWindow();
             window.Show();
         }
+        private void btnContacts_Click(object sender, RoutedEventArgs e)
+        {
+            ContactWindow window = new ContactWindow();
+            window.Show();
+        }
     }
 }
