@@ -5,6 +5,7 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 {
     public class AccueilFamilleRepository
     {
+        //avant WPF
         private readonly string _connectionString;
 
         public AccueilFamilleRepository(string connectionString)
