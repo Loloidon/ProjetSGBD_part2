@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Npgsql;
+﻿using Npgsql;
+using NpgsqlTypes;
 using ProjetSGBD_part1_THIJSSEN_LOIC.Metier;
 
 namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 {
-
     public class CompatibiliteRepository
     {
         private readonly string _connectionString;
@@ -24,46 +19,70 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             connection.Open();
 
             string sql = @"
-            INSERT INTO compatibilite
-            (id_animal, type_compatibilite, valeur, description)
-            VALUES
-            (@id_animal, @type_compatibilite, @valeur, @description);
-        ";
+                CALL ajouter_compatibilite(
+                    @id_animal,
+                    @type_compatibilite,
+                    @valeur,
+                    @description
+                );
+            ";
 
             using var command = new NpgsqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id_animal", compatibilite.IdAnimal);
-            command.Parameters.AddWithValue("@type_compatibilite", compatibilite.TypeCompatibilite);
-            command.Parameters.AddWithValue("@valeur", compatibilite.Valeur);
-            command.Parameters.AddWithValue("@description",
-                string.IsNullOrWhiteSpace(compatibilite.Description)
-                    ? DBNull.Value
-                    : compatibilite.Description);
+            command.Parameters.Add("@id_animal", NpgsqlDbType.Integer)
+                .Value = compatibilite.IdAnimal;
 
-            command.ExecuteNonQuery();
+            command.Parameters.Add("@type_compatibilite", NpgsqlDbType.Varchar)
+                .Value = compatibilite.TypeCompatibilite;
+
+            command.Parameters.Add("@valeur", NpgsqlDbType.Varchar)
+                .Value = compatibilite.Valeur;
+
+            command.Parameters.Add("@description", NpgsqlDbType.Text)
+                .Value = string.IsNullOrWhiteSpace(compatibilite.Description)
+                    ? DBNull.Value
+                    : compatibilite.Description;
+
+            try
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Compatibilité ajoutée.");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
+
         public void Supprimer(int idAnimal, string typeCompatibilite)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             string sql = @"
-            DELETE FROM compatibilite
-            WHERE id_animal = @id_animal
-            AND type_compatibilite = @type_compatibilite;
-    ";
+                CALL supprimer_compatibilite(
+                    @id_animal,
+                    @type_compatibilite
+                );
+            ";
 
             using var command = new NpgsqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id_animal", idAnimal);
-            command.Parameters.AddWithValue("@type_compatibilite", typeCompatibilite);
+            command.Parameters.Add("@id_animal", NpgsqlDbType.Integer)
+                .Value = idAnimal;
 
-            int nbLignes = command.ExecuteNonQuery();
+            command.Parameters.Add("@type_compatibilite", NpgsqlDbType.Varchar)
+                .Value = typeCompatibilite;
 
-            if (nbLignes > 0)
+            try
+            {
+                command.ExecuteNonQuery();
                 Console.WriteLine("Compatibilité supprimée.");
-            else
-                Console.WriteLine("Compatibilité introuvable.");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
     }
 }

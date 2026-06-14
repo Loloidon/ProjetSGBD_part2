@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Npgsql;
+using NpgsqlTypes;
+using ProjetSGBD_part1_THIJSSEN_LOIC.Metier;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ProjetSGBD_part1_THIJSSEN_LOIC.Metier;
-using Npgsql;
 namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 {
     public class AnimalRepository
@@ -21,41 +22,58 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             connection.Open();
 
             string sql = @"
-                Insert INTO animal
-                (nom,type_animal, sexe, date_naissance, sterilise,date_sterilisation, couleurs, description, particularites, etat_courant, date_deces )
-                VALUES
-                (@nom,@type_animal,@sexe,@date_naissance,@sterilise, @date_sterilisation,@couleurs, @description, @particularites, @etat_courant, @date_deces);
-            ";
+        CALL ajouter_animal(
+            @nom,
+            @type_animal,
+            @sexe,
+            @date_naissance,
+            @sterilise,
+            @date_sterilisation,
+            @couleurs,
+            @description,
+            @particularites,
+            @etat_courant,
+            @date_deces
+        );
+    ";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@nom", animal.Nom);
-            command.Parameters.AddWithValue("@type_animal", animal.TypeAnimal);
-            command.Parameters.AddWithValue("@sexe", animal.Sexe);
-            command.Parameters.AddWithValue("@date_naissance", animal.DateNaissance);
-            command.Parameters.AddWithValue("@sterilise", animal.Sterilise);
 
+            command.Parameters.Add("@nom", NpgsqlDbType.Varchar).Value = animal.Nom;
+            command.Parameters.Add("@type_animal", NpgsqlDbType.Varchar).Value = animal.TypeAnimal;
+            command.Parameters.Add("@sexe", NpgsqlDbType.Varchar).Value = animal.Sexe;
 
-            command.Parameters.AddWithValue("@date_sterilisation", animal.DateSterilisation ?? (object)DBNull.Value);
-            
-            command.Parameters.AddWithValue("@couleurs", animal.Couleurs);
-            command.Parameters.AddWithValue("@description", animal.Description);
-            command.Parameters.AddWithValue("@particularites", animal.Particularites);
-            command.Parameters.AddWithValue("@etat_courant", animal.EtatCourant);
-            
-            command.Parameters.AddWithValue("@date_deces", animal.DateDeces ?? (object)DBNull.Value);
-            
-            
+            command.Parameters.Add("@date_naissance", NpgsqlDbType.Date).Value = animal.DateNaissance;
 
-            command.ExecuteNonQuery();
+            command.Parameters.Add("@sterilise", NpgsqlDbType.Boolean).Value = animal.Sterilise;
 
-            connection.Close();
+            command.Parameters.Add("@date_sterilisation", NpgsqlDbType.Date).Value =
+                animal.DateSterilisation ?? (object)DBNull.Value;
+
+            command.Parameters.Add("@couleurs", NpgsqlDbType.Varchar).Value = animal.Couleurs;
+            command.Parameters.Add("@description", NpgsqlDbType.Text).Value = animal.Description;
+            command.Parameters.Add("@particularites", NpgsqlDbType.Text).Value = animal.Particularites;
+            command.Parameters.Add("@etat_courant", NpgsqlDbType.Varchar).Value = animal.EtatCourant;
+
+            command.Parameters.Add("@date_deces", NpgsqlDbType.Date).Value =
+                animal.DateDeces ?? (object)DBNull.Value;
+
+            try
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Animal ajouté.");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
         public void AfficherTout()
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM animal";
+            string sql = "SELECT * FROM afficher_tous_animaux();";
 
             using var command = new NpgsqlCommand(sql, connection);
             using var reader = command.ExecuteReader();
@@ -71,18 +89,15 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                 );
             }
         }
-        public void  AfficherUn(int id)
+        public void AfficherUn(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            string sql = @"
-                SELECT *
-                FROM animal
-                WHERE id_animal = @id;
-            ";
-            using var command = new NpgsqlCommand(sql , connection);
-            command.Parameters.AddWithValue("@id",id); 
             connection.Open();
 
+            string sql = "SELECT * FROM afficher_un_animal(@id);";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
             using var reader = command.ExecuteReader();
 
@@ -93,36 +108,32 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                     $"Nom: {reader["nom"]} | " +
                     $"Type: {reader["type_animal"]} | " +
                     $"Sexe: {reader["sexe"]} | " +
-                    $"État: {reader["etat_courant"]}");
+                    $"État: {reader["etat_courant"]}"
+                );
             }
             else
             {
-                Console.WriteLine("Animal introuvable");
+                Console.WriteLine("Animal introuvable.");
             }
-                connection.Close();
         }
         public void SupprimerUn(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = @"
-                        DELETE FROM animal
-                        WHERE id_animal = @id;
-                    ";
+            string sql = "CALL supprimer_animal(@id);";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
-            int nbLignes = command.ExecuteNonQuery();
-
-            if (nbLignes > 0)
+            try
             {
+                command.ExecuteNonQuery();
                 Console.WriteLine("Animal supprimé.");
             }
-            else
+            catch (PostgresException ex)
             {
-                Console.WriteLine("Animal introuvable.");
+                Console.WriteLine(ex.MessageText);
             }
         }
         public void ListerAnimauxRefuge()
@@ -130,11 +141,9 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM animal" +
-                " WHERE etat_courant = @etat";
+            string sql = "SELECT * FROM lister_animaux_refuge();";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@etat", "refuge");
             using var reader = command.ExecuteReader();
 
             while (reader.Read())
