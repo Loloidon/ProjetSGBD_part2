@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Npgsql;
+using NpgsqlTypes;
 
 namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 {
@@ -22,14 +23,17 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT id_vaccin, nom_vaccin FROM vaccin ORDER BY id_vaccin;";
+            string sql = "SELECT * FROM afficher_vaccins();";
 
             using var command = new NpgsqlCommand(sql, connection);
             using var reader = command.ExecuteReader();
 
             while (reader.Read())
             {
-                Console.WriteLine($"ID: {reader["id_vaccin"]} | Vaccin: {reader["nom_vaccin"]}");
+                Console.WriteLine(
+                    $"ID: {reader["id_vaccin"]} | " +
+                    $"Vaccin: {reader["nom_vaccin"]}"
+                );
             }
         }
 
@@ -39,20 +43,33 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             connection.Open();
 
             string sql = @"
-                INSERT INTO vaccination
-                (id_animal, id_vaccin, date_vaccination)
-                VALUES
-                (@id_animal, @id_vaccin, @date_vaccination);
-            ";
+        CALL ajouter_vaccination(
+            @id_animal,
+            @id_vaccin,
+            @date_vaccination
+        );
+    ";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id_animal", idAnimal);
-            command.Parameters.AddWithValue("@id_vaccin", idVaccin);
-            command.Parameters.AddWithValue("@date_vaccination", dateVaccination);
 
-            command.ExecuteNonQuery();
+            command.Parameters.Add("@id_animal", NpgsqlDbType.Integer)
+                .Value = idAnimal;
 
-            Console.WriteLine("Vaccination ajoutée !");
+            command.Parameters.Add("@id_vaccin", NpgsqlDbType.Integer)
+                .Value = idVaccin;
+
+            command.Parameters.Add("@date_vaccination", NpgsqlDbType.Date)
+                .Value = dateVaccination;
+
+            try
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Vaccination ajoutée !");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
 
         public void AfficherVaccinsAnimal(int idAnimal)
@@ -61,21 +78,14 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             connection.Open();
 
             string sql = @"
-                SELECT v.id_vaccin,
-                       v.nom_vaccin,
-                       CASE 
-                           WHEN va.id_animal IS NULL THEN 'non fait'
-                           ELSE 'fait'
-                       END AS statut
-                FROM vaccin v
-                LEFT JOIN vaccination va 
-                    ON v.id_vaccin = va.id_vaccin
-                    AND va.id_animal = @id_animal
-                ORDER BY v.id_vaccin;
-            ";
+        SELECT *
+        FROM afficher_vaccins_animal(@id_animal);
+    ";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id_animal", idAnimal);
+
+            command.Parameters.Add("@id_animal", NpgsqlDbType.Integer)
+                .Value = idAnimal;
 
             using var reader = command.ExecuteReader();
 
