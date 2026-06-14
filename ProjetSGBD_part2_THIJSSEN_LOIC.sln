@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjetSGBD_part2_THIJSSEN_LOIC", "ProjetSGBD_part1_THIJSSEN_LOIC\ProjetSGBD_part2_THIJSSEN_LOIC.csproj", "{931356E7-3F60-49C9-B807-DCB9835B72F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjetSGBD_part_2_THIJSSEN_LOIC_WPF", "ProjetSGBD_part_2_THIJSSEN_LOIC_WPF\ProjetSGBD_part_2_THIJSSEN_LOIC_WPF.csproj", "{EC165340-3BA4-429F-8076-39C759A3DB01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{931356E7-3F60-49C9-B807-DCB9835B72F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{931356E7-3F60-49C9-B807-DCB9835B72F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{931356E7-3F60-49C9-B807-DCB9835B72F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC165340-3BA4-429F-8076-39C759A3DB01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC165340-3BA4-429F-8076-39C759A3DB01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC165340-3BA4-429F-8076-39C759A3DB01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC165340-3BA4-429F-8076-39C759A3DB01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
