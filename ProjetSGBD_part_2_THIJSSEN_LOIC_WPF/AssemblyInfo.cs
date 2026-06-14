@@ -1,4 +1,6 @@
 using System.Windows;
+using ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess;
+using ProjetSGBD_part1_THIJSSEN_LOIC.Metier;
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None,            //where theme specific resource dictionaries are located

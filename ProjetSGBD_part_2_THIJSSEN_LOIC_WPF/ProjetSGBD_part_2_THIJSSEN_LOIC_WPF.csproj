@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProjetSGBD_part1_THIJSSEN_LOIC\ProjetSGBD_part2_THIJSSEN_LOIC.csproj" />
+  </ItemGroup>
+
 </Project>
