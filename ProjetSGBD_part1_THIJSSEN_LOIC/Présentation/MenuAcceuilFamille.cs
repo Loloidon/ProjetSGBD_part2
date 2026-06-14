@@ -63,7 +63,7 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.Présentation
             _contactRepository.AfficherTout();
 
             int idContact = LireEntier("ID du contact / famille d'accueil : ");
-            _accueilRepository.ListerAnimauxAcceuillisFamille(idContact);
+            _accueilRepository.ListerAnimauxAccueillisFamille(idContact);
         }
 
         private int LireEntier(string message)
