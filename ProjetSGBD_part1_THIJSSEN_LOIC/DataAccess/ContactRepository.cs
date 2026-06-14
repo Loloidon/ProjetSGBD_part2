@@ -1,10 +1,6 @@
 ﻿using Npgsql;
+using NpgsqlTypes;
 using ProjetSGBD_part1_THIJSSEN_LOIC.Metier;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
 {
@@ -23,100 +19,104 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
             connection.Open();
 
             string sql = @"
-            INSERT INTO contact
-            (nom, prenom, registre, adresse, gsm, mail)
-            VALUES
-            (@nom, @prenom, @registre, @adresse, @gsm, @mail);
-        ";
+                CALL ajouter_contact(
+                    @nom,
+                    @prenom,
+                    @registre,
+                    @adresse,
+                    @gsm,
+                    @mail
+                );
+            ";
 
             using var command = new NpgsqlCommand(sql, connection);
 
-            
-            command.Parameters.AddWithValue("@nom", contact.Nom);
-            command.Parameters.AddWithValue("@prenom",contact.Prenom);
-            command.Parameters.AddWithValue("@registre",contact.Registre);
-            command.Parameters.AddWithValue("@adresse",contact.Adresse);
-            command.Parameters.AddWithValue("@gsm", contact.Gsm);
-            command.Parameters.AddWithValue("@mail", contact.Mail);
-                
+            command.Parameters.Add("@nom", NpgsqlDbType.Varchar).Value = contact.Nom;
+            command.Parameters.Add("@prenom", NpgsqlDbType.Varchar).Value = contact.Prenom;
+            command.Parameters.Add("@registre", NpgsqlDbType.Varchar).Value = contact.Registre;
+            command.Parameters.Add("@adresse", NpgsqlDbType.Varchar).Value = contact.Adresse;
+            command.Parameters.Add("@gsm", NpgsqlDbType.Varchar).Value = contact.Gsm;
+            command.Parameters.Add("@mail", NpgsqlDbType.Varchar).Value = contact.Mail;
 
-            command.ExecuteNonQuery();
+            try
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Contact ajouté.");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
+
         public void Supprimer(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = @"
-                        DELETE FROM contact
-                        WHERE id_contact = @id;
-                    ";
+            string sql = "CALL supprimer_contact(@id);";
 
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
             try
             {
-                int nbLignes = command.ExecuteNonQuery();
-
-                if (nbLignes > 0)
-                {
-                    Console.WriteLine("Contact supprimé.");
-                }
-                else
-                {
-                    Console.WriteLine("Contact introuvable.");
-                }
+                command.ExecuteNonQuery();
+                Console.WriteLine("Contact supprimé.");
             }
-            catch (PostgresException)
+            catch (PostgresException ex)
             {
-                Console.WriteLine(
-                    "Impossible de supprimer ce contact : " +
-                    "il est lié à une adoption, un accueil famille " +
-                    "ou une entrée/sortie du refuge."
-                );
+                Console.WriteLine(ex.MessageText);
             }
         }
+
         public void Modifier(int id, Contact contact)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             string sql = @"
-                        UPDATE contact
-                        SET nom = @nom,
-                            prenom = @prenom,
-                            registre = @registre,
-                            adresse = @adresse,
-                            gsm = @gsm,
-                            mail = @mail
-                        WHERE id_contact = @id;
-                    ";
+                CALL modifier_contact(
+                    @id,
+                    @nom,
+                    @prenom,
+                    @registre,
+                    @adresse,
+                    @gsm,
+                    @mail
+                );
+            ";
 
             using var command = new NpgsqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@nom", contact.Nom);
-            command.Parameters.AddWithValue("@prenom", contact.Prenom);
-            command.Parameters.AddWithValue("@registre", contact.Registre);
-            command.Parameters.AddWithValue("@adresse", contact.Adresse);
-            command.Parameters.AddWithValue("@gsm", contact.Gsm);
-            command.Parameters.AddWithValue("@mail", contact.Mail);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
+            command.Parameters.Add("@nom", NpgsqlDbType.Varchar).Value = contact.Nom;
+            command.Parameters.Add("@prenom", NpgsqlDbType.Varchar).Value = contact.Prenom;
+            command.Parameters.Add("@registre", NpgsqlDbType.Varchar).Value = contact.Registre;
+            command.Parameters.Add("@adresse", NpgsqlDbType.Varchar).Value = contact.Adresse;
+            command.Parameters.Add("@gsm", NpgsqlDbType.Varchar).Value = contact.Gsm;
+            command.Parameters.Add("@mail", NpgsqlDbType.Varchar).Value = contact.Mail;
 
-            command.ExecuteNonQuery();
+            try
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Contact modifié.");
+            }
+            catch (PostgresException ex)
+            {
+                Console.WriteLine(ex.MessageText);
+            }
         }
+
         public void AfficherUn(int id)
         {
             using var connection = new NpgsqlConnection(_connectionString);
-            string sql = @"
-                SELECT *
-                FROM contact
-                WHERE id_contact = @id;
-            ";
-            using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", id);
             connection.Open();
 
+            string sql = "SELECT * FROM afficher_un_contact(@id);";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
             using var reader = command.ExecuteReader();
 
@@ -129,22 +129,21 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                     $"Registre: {reader["registre"]} | " +
                     $"Adresse: {reader["adresse"]} | " +
                     $"Gsm: {reader["gsm"]} | " +
-                    $"Mail: {reader["mail"]}");
-
-
+                    $"Mail: {reader["mail"]}"
+                );
             }
             else
             {
-                Console.WriteLine("Contact introuvable");
+                Console.WriteLine("Contact introuvable.");
             }
-            connection.Close();
         }
+
         public void AfficherTout()
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM contact";
+            string sql = "SELECT * FROM afficher_tous_contacts();";
 
             using var command = new NpgsqlCommand(sql, connection);
             using var reader = command.ExecuteReader();
