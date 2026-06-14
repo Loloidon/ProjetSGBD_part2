@@ -1,0 +1,59 @@
+﻿<Window x:Class="ProjetSGBD_part_2_THIJSSEN_LOIC_WPF.AnimalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Animaux" Height="650" Width="1000">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <TextBlock Text="Gestion des animaux" FontSize="22" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <WrapPanel>
+                <TextBox x:Name="txtId" Width="80" Margin="5" Text="ID"/>
+                <TextBox x:Name="txtNom" Width="120" Margin="5" Text="Nom"/>
+                <TextBox x:Name="txtType" Width="100" Margin="5" Text="chien/chat"/>
+                <TextBox x:Name="txtSexe" Width="60" Margin="5" Text="M/F"/>
+                <TextBox x:Name="txtDateNaissance" Width="130" Margin="5" Text="yyyy-mm-dd"/>
+                <CheckBox x:Name="chkSterilise" Content="Stérilisé" Margin="5"/>
+                <TextBox x:Name="txtDateSterilisation" Width="130" Margin="5" Text="date stérilisation"/>
+                <TextBox x:Name="txtCouleurs" Width="120" Margin="5" Text="Couleurs"/>
+                <TextBox x:Name="txtDescription" Width="150" Margin="5" Text="Description"/>
+                <TextBox x:Name="txtParticularites" Width="150" Margin="5" Text="Particularités"/>
+                <TextBox x:Name="txtEtat" Width="100" Margin="5" Text="refuge"/>
+                <TextBox x:Name="txtDateDeces" Width="120" Margin="5" Text="date décès"/>
+            </WrapPanel>
+        </StackPanel>
+
+        <DataGrid x:Name="dgAnimaux"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Margin="0,10,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding IdAnimal}" Width="60"/>
+                <DataGridTextColumn Header="Nom" Binding="{Binding Nom}" Width="120"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding TypeAnimal}" Width="100"/>
+                <DataGridTextColumn Header="Sexe" Binding="{Binding Sexe}" Width="60"/>
+                <DataGridTextColumn Header="Naissance" Binding="{Binding DateNaissance}" Width="130"/>
+                <DataGridCheckBoxColumn Header="Stérilisé" Binding="{Binding Sterilise}" Width="80"/>
+                <DataGridTextColumn Header="Couleurs" Binding="{Binding Couleurs}" Width="120"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="150"/>
+                <DataGridTextColumn Header="Particularités" Binding="{Binding Particularites}" Width="150"/>
+                <DataGridTextColumn Header="État" Binding="{Binding EtatCourant}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <WrapPanel Grid.Row="2" HorizontalAlignment="Center">
+            <Button Content="Lister les animaux" Width="150" Height="35" Margin="5" Click="btnLister_Click"/>
+            <Button Content="Afficher par ID" Width="150" Height="35" Margin="5" Click="btnAfficherUn_Click"/>
+            <Button Content="Lister refuge" Width="150" Height="35" Margin="5" Click="btnListerRefuge_Click"/>
+            <Button Content="Ajouter" Width="150" Height="35" Margin="5" Click="btnAjouter_Click"/>
+            <Button Content="Supprimer" Width="150" Height="35" Margin="5" Click="btnSupprimer_Click"/>
+        </WrapPanel>
+    </Grid>
+</Window>

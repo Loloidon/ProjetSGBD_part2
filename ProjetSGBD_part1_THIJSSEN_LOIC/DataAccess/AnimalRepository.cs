@@ -157,5 +157,86 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                 );
             }
         }
+        public List<Animal> GetAll()
+        {
+            List<Animal> animaux = new List<Animal>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM afficher_tous_animaux();";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                animaux.Add(LireAnimal(reader));
+            }
+
+            return animaux;
+        }
+        public Animal? GetById(int id)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM afficher_un_animal(@id);";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
+
+            using var reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return LireAnimal(reader);
+            }
+
+            return null;
+        }
+        public List<Animal> GetAnimauxRefuge()
+        {
+            List<Animal> animaux = new List<Animal>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM lister_animaux_refuge();";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                animaux.Add(LireAnimal(reader));
+            }
+
+            return animaux;
+        }
+        private Animal LireAnimal(NpgsqlDataReader reader)
+        {
+            return new Animal
+            {
+                IdAnimal = Convert.ToInt32(reader["id_animal"]),
+                Nom = reader["nom"].ToString() ?? "",
+                TypeAnimal = reader["type_animal"].ToString() ?? "",
+                Sexe = reader["sexe"].ToString() ?? "",
+                DateNaissance = reader["date_naissance"] == DBNull.Value
+                ? DateTime.MinValue
+                : ((DateOnly)reader["date_naissance"]).ToDateTime(TimeOnly.MinValue),
+                Sterilise = reader["sterilise"] != DBNull.Value && Convert.ToBoolean(reader["sterilise"]),
+                DateSterilisation = reader["date_sterilisation"] == DBNull.Value
+                ? null
+                : ((DateOnly)reader["date_sterilisation"]).ToDateTime(TimeOnly.MinValue),
+                Couleurs = reader["couleurs"].ToString() ?? "",
+                Description = reader["description"].ToString() ?? "",
+                Particularites = reader["particularites"].ToString() ?? "",
+                EtatCourant = reader["etat_courant"].ToString() ?? "",
+                DateDeces = reader["date_deces"] == DBNull.Value
+                ? null
+                : ((DateOnly)reader["date_deces"]).ToDateTime(TimeOnly.MinValue),
+            };
+        }
     }
 }
