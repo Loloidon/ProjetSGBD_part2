@@ -24,5 +24,15 @@ namespace ProjetSGBD_part_2_THIJSSEN_LOIC_WPF
             AdoptionWindow window = new AdoptionWindow();
             window.Show();
         }
+        private void btnAccueilFamille_Click(object sender, RoutedEventArgs e)
+        {
+            AccueilFamilleWindow window = new AccueilFamilleWindow();
+            window.Show();
+        }
+        private void btnVaccins_Click(object sender, RoutedEventArgs e)
+        {
+            VaccinWindow window = new VaccinWindow();
+            window.Show();
+        }
     }
 }

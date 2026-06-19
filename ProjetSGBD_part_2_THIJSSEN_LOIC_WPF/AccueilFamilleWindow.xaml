@@ -1,0 +1,82 @@
+﻿<Window x:Class="ProjetSGBD_part_2_THIJSSEN_LOIC_WPF.AccueilFamilleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Familles d'accueil"
+        Height="600"
+        Width="1000">
+
+    <Grid Margin="10">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+
+            <TextBlock Text="Gestion des familles d'accueil"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,15"/>
+
+            <WrapPanel>
+
+                <TextBox x:Name="txtIdAnimal"
+                         Width="100"
+                         Margin="5"
+                         Text="ID animal"/>
+
+                <TextBox x:Name="txtIdContact"
+                         Width="100"
+                         Margin="5"
+                         Text="ID contact"/>
+
+                <TextBox x:Name="txtDateDebut"
+                         Width="130"
+                         Margin="5"
+                         Text="yyyy-mm-dd"/>
+
+                <TextBox x:Name="txtDateFin"
+                         Width="130"
+                         Margin="5"
+                         Text="date fin"/>
+
+            </WrapPanel>
+
+        </StackPanel>
+
+        <DataGrid x:Name="dgAccueils"
+                  Grid.Row="1"
+                  Margin="0,10,0,10"
+                  AutoGenerateColumns="True"
+                  IsReadOnly="True"/>
+
+        <WrapPanel Grid.Row="2"
+                   HorizontalAlignment="Center">
+
+            <Button x:Name="btnAjouter"
+                    Content="Ajouter accueil"
+                    Width="170"
+                    Height="35"
+                    Margin="5"
+                    Click="btnAjouter_Click"/>
+
+            <Button x:Name="btnListerFamillesAnimal"
+                    Content="Lister familles animal"
+                    Width="190"
+                    Height="35"
+                    Margin="5"
+                    Click="btnListerFamillesAnimal_Click"/>
+
+            <Button x:Name="btnListerAnimauxFamille"
+                    Content="Lister animaux famille"
+                    Width="190"
+                    Height="35"
+                    Margin="5"
+                    Click="btnListerAnimauxFamille_Click"/>
+
+        </WrapPanel>
+
+    </Grid>
+</Window>
