@@ -34,5 +34,10 @@ namespace ProjetSGBD_part_2_THIJSSEN_LOIC_WPF
             VaccinWindow window = new VaccinWindow();
             window.Show();
         }
+        private void btnCompatibilites_Click(object sender, RoutedEventArgs e)
+        {
+            CompatibiliteWindow window = new CompatibiliteWindow();
+            window.Show();
+        }
     }
 }
