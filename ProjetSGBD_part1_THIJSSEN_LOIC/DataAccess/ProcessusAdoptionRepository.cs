@@ -100,5 +100,34 @@ namespace ProjetSGBD_part1_THIJSSEN_LOIC.DataAccess
                 Console.WriteLine(ex.MessageText);
             }
         }
+        public List<ProcessusAdoption> GetAll()
+        {
+            List<ProcessusAdoption> adoptions = new List<ProcessusAdoption>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string sql = "SELECT * FROM lister_processus_adoptions();";
+
+            using var command = new NpgsqlCommand(sql, connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                adoptions.Add(new ProcessusAdoption
+                {
+                    IdProcessus = Convert.ToInt32(reader["id_processus"]),
+                    DateDemande = reader["date_demande"] == DBNull.Value
+                        ? DateTime.MinValue
+                        : ((DateOnly)reader["date_demande"]).ToDateTime(TimeOnly.MinValue),
+                    StatutAdoption = reader["statutadoption"].ToString() ?? "",
+                    NomAnimal = reader["nom_animal"].ToString() ?? "",
+                    NomContact = reader["nom_contact"].ToString() ?? "",
+                    PrenomContact = reader["prenom_contact"].ToString() ?? ""
+                });
+            }
+
+            return adoptions;
+        }
     }
 }

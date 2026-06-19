@@ -19,5 +19,10 @@ namespace ProjetSGBD_part_2_THIJSSEN_LOIC_WPF
             ContactWindow window = new ContactWindow();
             window.Show();
         }
+        private void btnAdoptions_Click(object sender, RoutedEventArgs e)
+        {
+            AdoptionWindow window = new AdoptionWindow();
+            window.Show();
+        }
     }
 }
